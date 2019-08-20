@@ -120,12 +120,17 @@ let
 in
 
 {
+  # Raw Nix expression containing the module documentation.
   inherit optionsDocs;
 
+  # Slightly cleaned up JSON representation of the module
+  # documentation.
   json = import ./modules-json.nix {
     inherit pkgs lib optionsDocs;
   };
 
+  # DocBook representation of the module documentation, suitable for
+  # into a DocBook document.
   docBook = import ./modules-docbook.nix {
     inherit pkgs lib optionsDocs mkModuleUrl channelName;
   };
