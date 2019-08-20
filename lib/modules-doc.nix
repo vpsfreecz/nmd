@@ -101,7 +101,7 @@ let
           );
         in
           {
-            attrName = "pkgs.${name}";
+            attrName = name;
             packageName = pkg.meta.name;
             available = pkg.meta.available;
           }

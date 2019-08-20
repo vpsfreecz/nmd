@@ -70,8 +70,7 @@
                                 <para>
                                     <emphasis>Related packages:</emphasis>
                                     <xsl:text> </xsl:text>
-                                    <xsl:value-of disable-output-escaping="yes"
-                                                  select="attr[@name = 'relatedPackages']/string/@value" />
+                                    <xsl:apply-templates select="attr[@name = 'relatedPackages']" />
                                 </para>
                             </xsl:if>
 
@@ -193,5 +192,26 @@
         <xsl:text>λ</xsl:text>
     </xsl:template>
 
+    <xsl:template match="attr[@name = 'relatedPackages']">
+        <itemizedlist>
+            <xsl:for-each select="list/attrs">
+                <listitem>
+                    <para>
+                        <literal><xsl:text>pkgs.</xsl:text><xsl:value-of select="attr[@name = 'attrName']/string/@value" /></literal>
+                        <xsl:text> (</xsl:text>
+                        <xsl:value-of select="attr[@name = 'packageName']/string/@value" />
+                        <xsl:text>)</xsl:text>
+                        <xsl:if test="attr[@name = 'available'] and attr/bool[@value = 'false']">
+                            <emphasis><xsl:text> [UNAVAILABLE]</xsl:text></emphasis>
+                        </xsl:if>
+                        <xsl:if test="attr[@name = 'description']">
+                            <xsl:text>: </xsl:text>
+                            <xsl:value-of select="attr[@name = 'description']/string/@value"/>
+                        </xsl:if>
+                    </para>
+                </listitem>
+            </xsl:for-each>
+        </itemizedlist>
+    </xsl:template>
 
 </xsl:stylesheet>
