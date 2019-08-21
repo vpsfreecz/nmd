@@ -102,9 +102,9 @@
     <xsl:template match="*" mode="top">
         <xsl:choose>
             <xsl:when test="string[contains(@value, '&#010;')]">
-                <programlisting>
-                    <xsl:text>''
-                </xsl:text><xsl:value-of select='str:replace(string/@value, "${", "&apos;&apos;${")' /><xsl:text>''</xsl:text></programlisting>
+<programlisting>
+<xsl:text>''
+</xsl:text><xsl:value-of select='str:replace(string/@value, "${", "&apos;&apos;${")' /><xsl:text>''</xsl:text></programlisting>
             </xsl:when>
             <xsl:otherwise>
                 <literal><xsl:apply-templates /></literal>
