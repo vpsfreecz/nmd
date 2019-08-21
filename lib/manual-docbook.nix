@@ -214,5 +214,5 @@ in
 {
   inherit manualCombined olinkDb;
   inherit html manPages;
-  htmlOpenTool = lib.makeOverridable htmlOpenTool { };
+  htmlOpenTool = makeOverridable htmlOpenTool { };
 }
