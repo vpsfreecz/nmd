@@ -30,7 +30,7 @@
   #     particular the path `nmd-result/<id>.xml`.
   #
   # Example:
-  #   docBook = { id = "myproject-options"; }
+  #   docBook = { id = "myproject-options"; optionIdPrefix = "mp-opt"; }
 , docBook
 }:
 
@@ -180,9 +180,11 @@ in
   };
 
   # DocBook representation of the module documentation, suitable for
-  # into a DocBook document.
-  docBook = import ./modules-docbook.nix {
-    inherit pkgs lib optionsDocs mkModuleUrl channelName;
-    elementId = docBook.id;
-  };
+  # inclusion into a DocBook document.
+  docBook = import ./modules-docbook.nix (
+    {
+      inherit pkgs lib optionsDocs mkModuleUrl channelName;
+    }
+    // docBook
+  );
 }

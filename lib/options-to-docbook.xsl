@@ -11,12 +11,13 @@
     <xsl:output method='xml' encoding="UTF-8" />
 
     <xsl:param name="elementId" />
+    <xsl:param name="optionIdPrefix" />
 
     <xsl:template match="/expr/list">
         <variablelist>
             <xsl:attribute name="xml:id"><xsl:value-of select="$elementId"/></xsl:attribute>
             <xsl:for-each select="attrs">
-                <xsl:variable name="id" select="concat('opt-', str:replace(str:replace(str:replace(str:replace(attr[@name = 'name']/string/@value, '*', '_'), '&lt;', '_'), '>', '_'), '?', '_'))" />
+                <xsl:variable name="id" select="concat($optionIdPrefix, '-', str:replace(str:replace(str:replace(str:replace(attr[@name = 'name']/string/@value, '*', '_'), '&lt;', '_'), '>', '_'), '?', '_'))" />
                 <varlistentry>
                     <term xlink:href="#{$id}">
                         <xsl:attribute name="xml:id"><xsl:value-of select="$id"/></xsl:attribute>

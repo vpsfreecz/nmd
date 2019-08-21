@@ -3,7 +3,14 @@
 
   # ID of the `variablelist` DocBook element holding the documented
   # options.
-, elementId
+, id
+
+  # Prefix to add to specific option entries. For an option `foo.bar`
+  # the XML identifier is `<optionIdPrefix>-foo.bar`.
+  #
+  # Example:
+  #    optionIdPrefix = "myopt";
+, optionIdPrefix ? "opt"
 
   # A function taking the relative module path to an URL where the
   # module can be viewed.
@@ -35,13 +42,11 @@ let
     ''
       mkdir $out
       xsltproc \
-        --stringparam elementId '${elementId}' \
-        -o $out/nmd-result/${elementId}.xml \
+        --stringparam elementId '${id}' \
+        --stringparam optionIdPrefix '${optionIdPrefix}' \
+        -o $out/nmd-result/${id}.xml \
         ${./options-to-docbook.xsl} ${optionsXml}
     '';
-
-  # docbookOptionDocs =
-  #   (map expandDeclaration optionsDocs);
 
 in
 
