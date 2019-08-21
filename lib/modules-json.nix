@@ -14,11 +14,13 @@ let
     in
       listToAttrs (map attributify optionsDocs);
 
-  jsonFile =
-    pkgs.writeText "options.json"
-    (builtins.unsafeDiscardStringContext
-    (builtins.toJSON jsonData));
+  jsonFile = { path ? "options.json" }:
+    pkgs.writeTextFile {
+      name = builtins.baseNameOf path;
+      destination = "/${path}";
+      text = builtins.unsafeDiscardStringContext (builtins.toJSON jsonData);
+    };
 
 in
 
-jsonFile
+makeOverridable jsonFile { }
