@@ -8,7 +8,12 @@
   # List of modules documentation as produced by `buildModulesDocs`.
 , modulesDocs
 
-  # Directory of DocBook documents.
+  # Directory of DocBook documents. This directory is expected to
+  # contain the files
+  #
+  # - `manual.xml` containing a `book` element, and
+  #
+  # - `man-pages.xml` containing a `reference` element.
 , documentsDirectory
 }:
 
