@@ -15,6 +15,10 @@
   #
   # - `man-pages.xml` containing a `reference` element.
 , documentsDirectory
+
+  # DocBook table of content configuration. This should be a string
+  # containing a `toc` element.
+, chunkToc
 }:
 
 with lib;
@@ -93,17 +97,7 @@ let
         lintrng $out/man-pages-combined.xml
       '';
 
-  # TODO
-  toc = builtins.toFile "toc.xml"
-    ''
-      <toc role="chunk-toc">
-        <d:tocentry xmlns:d="http://docbook.org/ns/docbook" linkend="book-home-manager-manual"><?dbhtml filename="index.html"?>
-          <d:tocentry linkend="ch-options"><?dbhtml filename="options.html"?></d:tocentry>
-          <d:tocentry linkend="ch-tools"><?dbhtml filename="tools.html"?></d:tocentry>
-          <d:tocentry linkend="ch-release-notes"><?dbhtml filename="release-notes.html"?></d:tocentry>
-        </d:tocentry>
-      </toc>
-    '';
+  toc = builtins.toFile "toc.xml" chunkToc;
 
   manualXsltprocOptions = toString [
     "--param section.autolabel 1"
@@ -115,8 +109,6 @@ let
     "--stringparam admon.style ''"
     "--stringparam callout.graphics.extension .svg"
     "--stringparam current.docid manual"
-    "--param chunk.section.depth 0"
-    "--param chunk.first.sections 1"
     "--param use.id.as.filename 1"
     "--stringparam generate.toc 'book toc appendix toc'"
     "--stringparam chunk.toc ${toc}"
