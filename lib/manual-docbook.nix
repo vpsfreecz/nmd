@@ -6,7 +6,7 @@
   pathName
 
   # List of modules documentation as produced by `buildModulesDocs`.
-, modulesDocs
+, modulesDocs ? [ ]
 
   # Directory of DocBook documents. This directory is expected to
   # contain the files
