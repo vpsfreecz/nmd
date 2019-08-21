@@ -1,6 +1,10 @@
 { pkgs
 , lib
 
+  # ID of the `variablelist` DocBook element holding the documented
+  # options.
+, elementId
+
   # A function taking the relative module path to an URL where the
   # module can be viewed.
   #
@@ -29,7 +33,11 @@ let
       nativeBuildInputs = [ (getBin pkgs.libxslt) ];
     }
     ''
-      xsltproc -o $out ${./options-to-docbook.xsl} ${optionsXml}
+      mkdir $out
+      xsltproc \
+        --stringparam elementId '${elementId}' \
+        -o $out/nmd-result/${elementId}.xml \
+        ${./options-to-docbook.xsl} ${optionsXml}
     '';
 
   # docbookOptionDocs =

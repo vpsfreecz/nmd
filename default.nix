@@ -7,7 +7,7 @@ let
 in
 
 {
-  buildModuleDocs = import ./lib/modules-doc.nix { inherit lib pkgs; };
+  buildModulesDocs = import ./lib/modules-doc.nix { inherit lib pkgs; };
 
   docBook = import ./docbook.nix { inherit lib pkgs; };
 }

@@ -20,6 +20,18 @@
   # Example:
   #     channelName = "myproject"
 , channelName
+
+  # Options specific for DocBook output. If DocBook output is desired
+  # then this should contain the fields
+  #
+  # - id (string): Identifier of the module output. This value will be
+  #     used as the `xml:id` for the generated DocBook file. It will
+  #     also be used as the file name for the generated file, in
+  #     particular the path `nmd-result/<id>.xml`.
+  #
+  # Example:
+  #   docBook = { id = "myproject-options"; }
+, docBook
 }:
 
 with lib;
@@ -97,12 +109,8 @@ let
     channelPath = "${channelName}/${path}";
   };
 
-  # We need to strip references to /nix/store/* from options,
-  # including any `extraSources` if some modules came from elsewhere,
-  # or else the build will fail.
-  #
-  # E.g. if some `options` came from modules in ${pkgs.customModules}/nix,
-  # you'd need to include `extraSources = [ pkgs.customModules ]`
+  # We need to strip references to /nix/store/* from the options or
+  # else the build will fail.
   stripModulePathPrefixes =
     let
       prefixes = map (p: "${toString p}/") moduleRootPaths;
@@ -175,5 +183,6 @@ in
   # into a DocBook document.
   docBook = import ./modules-docbook.nix {
     inherit pkgs lib optionsDocs mkModuleUrl channelName;
+    elementId = docBook.id;
   };
 }
