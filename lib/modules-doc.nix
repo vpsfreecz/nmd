@@ -89,7 +89,14 @@ let
     (optionAttrSetToDocList
     (evaluatedModules.options)))));
 
-  moduleDocCompare = a: b: compareLists builtins.lessThan a.loc b.loc;
+  moduleDocCompare = a: b:
+    let
+      isEnable = lib.hasPrefix "enable";
+      isPackage = lib.hasPrefix "package";
+      compareWithPrio = pred: cmp: splitByAndCompare pred compare cmp;
+      moduleCmp = compareWithPrio isEnable (compareWithPrio isPackage compare);
+    in
+      compareLists moduleCmp a.loc b.loc < 0;
 
   cleanUpOption = opt:
     let
