@@ -177,6 +177,29 @@ let
         cp -r ${pkgs.documentation-highlighter} $dst/highlightjs
       '';
 
+  htmlOpenTool = { name ? "${pathName}-help" }:
+    pkgs.writeShellScriptBin
+      name
+      ''
+        set -euo pipefail
+
+        if [[ ! -v BROWSER || -z $BROWSER ]]; then
+          for candidate in xdg-open open w3m; do
+            BROWSER="$(type -P $candidate || true)"
+            if [[ -x $BROWSER ]]; then
+              break;
+            fi
+          done
+        fi
+
+        if [[ ! -v BROWSER || -z $BROWSER ]]; then
+          echo "$0: unable to start a web browser; please set \$BROWSER"
+          exit 1
+        else
+          exec "$BROWSER" "${html}/share/doc/${pathName}/index.html"
+        fi
+      '';
+
   manPages =
     runXmlCommand
       "man-pages"
@@ -199,4 +222,5 @@ in
 {
   inherit manualCombined olinkDb;
   inherit html manPages;
+  htmlOpenTool = lib.makeOverridable htmlOpenTool { };
 }
