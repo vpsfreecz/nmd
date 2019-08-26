@@ -27,9 +27,36 @@ let
 
   inherit (pkgs) docbook5 docbook5_xsl;
 
+  docBookFromAsciiDocDirectory =
+    pkgs.runCommand
+      "converted-asciidoc"
+      {
+        nativeBuildInputs = [
+          (getBin pkgs.asciidoc)
+          (getBin pkgs.libxslt)
+        ];
+      }
+      ''
+        function convert() {
+          mkdir -p $(dirname $2)
+          asciidoc -s -b docbook --out-file - "$1" \
+            | xsltproc -o "$2" ${docbook5}/share/xml/docbook-5.0/tools/db4-upgrade.xsl -
+        }
+
+        mkdir $out
+        cd "${documentsDirectory}"
+
+        for file in **/*.adoc ; do
+          echo Converting $file to DocBook ...
+          convert "$file" "$out/''${file%.adoc}.xml"
+        done
+      '';
+
   combinedDirectory = pkgs.buildEnv {
     name = "nmd-documents";
-    paths = [ documentsDirectory ] ++ map (v: v.docBook) modulesDocs;
+    paths =
+      [ documentsDirectory docBookFromAsciiDocDirectory ]
+      ++ map (v: v.docBook) modulesDocs;
   };
 
   manualXml = "${combinedDirectory}/manual.xml";
