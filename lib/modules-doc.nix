@@ -19,7 +19,11 @@
   #
   # Example:
   #     channelName = "myproject"
-, channelName
+  # , channelName
+
+  # A function taking the relative module path and returns path to the
+  # module in a channel
+, mkChannelPath
 
   # Options specific for DocBook output. If DocBook output is desired
   # then this should contain the fields
@@ -71,7 +75,7 @@ let
   mkDeclaration = decl: rec {
     path = stripModulePathPrefixes decl;
     url = mkModuleUrl path;
-    channelPath = "${channelName}/${path}";
+    channelPath = mkChannelPath path;
   };
 
   # We need to strip references to /nix/store/* from the options or
