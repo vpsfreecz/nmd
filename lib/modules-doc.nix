@@ -14,12 +14,9 @@ modules
 #     mkModuleUrl = path: "https://myproject.foo/${path}"
 , mkModuleUrl
 
-# The "typical" channel name for this module set. This will be used
-# to present a friendly path to the module defining an option.
-#
-# Example:
-#     channelName = "myproject"
-, channelName
+  # A function taking the relative module path and returns path to the
+  # module in a channel
+, mkChannelPath
 
 # Options specific for DocBook output. If DocBook output is desired
 # then this should contain the fields
@@ -62,7 +59,7 @@ let
   mkDeclaration = decl: rec {
     path = stripModulePathPrefixes decl;
     url = mkModuleUrl path;
-    channelPath = "${channelName}/${path}";
+    channelPath = mkChannelPath path;
   };
 
   # We need to strip references to /nix/store/* from the options or
