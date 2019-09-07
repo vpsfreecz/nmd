@@ -1,8 +1,6 @@
-{ pkgs }:
+{ pkgs, lib ? pkgs.lib }:
 
 let
-
-  lib = pkgs.lib;
 
   inherit (lib) isAttrs optionalAttrs isDerivation mapAttrs;
 
