@@ -4,15 +4,13 @@ with lib;
 
 let
 
-  jsonData =
-    let
-      trimAttrs = flip removeAttrs ["name" "visible" "internal"];
-      attributify = opt: {
-        inherit (opt) name;
-        value = trimAttrs opt;
-      };
-    in
-      listToAttrs (map attributify optionsDocs);
+  jsonData = let
+    trimAttrs = flip removeAttrs [ "name" "visible" "internal" ];
+    attributify = opt: {
+      inherit (opt) name;
+      value = trimAttrs opt;
+    };
+  in listToAttrs (map attributify optionsDocs);
 
   jsonFile = { path ? "options.json" }:
     pkgs.writeTextFile {
@@ -21,6 +19,4 @@ let
       text = builtins.unsafeDiscardStringContext (builtins.toJSON jsonData);
     };
 
-in
-
-makeOverridable jsonFile { }
+in makeOverridable jsonFile { }

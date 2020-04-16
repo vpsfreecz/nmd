@@ -19,22 +19,17 @@ let
   scrubDerivations = prefixPath: attrs:
     let
       scrubDerivation = name: value:
-        let
-          pkgAttrName = prefixPath + "." + name;
-        in
-          if isAttrs value then
-            scrubDerivations pkgAttrName value
-            // optionalAttrs (isDerivation value) {
-              outPath = "\${${pkgAttrName}}";
-            }
-          else
-            value;
-    in
-      mapAttrs scrubDerivation attrs;
+        let pkgAttrName = prefixPath + "." + name;
+        in if isAttrs value then
+          scrubDerivations pkgAttrName value
+          // optionalAttrs (isDerivation value) {
+            outPath = "\${${pkgAttrName}}";
+          }
+        else
+          value;
+    in mapAttrs scrubDerivation attrs;
 
-in
-
-{
+in {
   inherit scrubDerivations;
 
   buildModulesDocs = import ./lib/modules-doc.nix { inherit lib pkgs; };
