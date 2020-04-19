@@ -16,8 +16,12 @@ pathName
   # - `man-pages.xml` containing a `reference` element.
 , documentsDirectory
 
-# DocBook table of content configuration. This should be a string
-# containing a `toc` element.
+# The DocBook document type. Must be one of "article", "manpage", or
+# "book".
+, documentType ? "article"
+
+  # DocBook table of content configuration. This should be a string
+  # containing a `toc` element.
 , chunkToc }:
 
 with lib;
@@ -31,7 +35,7 @@ let
   } ''
     function convert() {
       mkdir -p $(dirname $2)
-      asciidoc -s -b docbook --out-file - "$1" \
+      asciidoc -s -d ${documentType} -b docbook --out-file - "$1" \
         | xsltproc -o "$2" ${docbook5}/share/xml/docbook-5.0/tools/db4-upgrade.xsl -
     }
 
