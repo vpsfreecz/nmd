@@ -42,7 +42,7 @@ let
     mkdir $out
     cd "${documentsDirectory}"
 
-    for file in **/*.adoc ; do
+    for file in *.adoc **/*.adoc ; do
       echo Converting $file to DocBook ...
       convert "$file" "$out/''${file%.adoc}.xml"
     done
