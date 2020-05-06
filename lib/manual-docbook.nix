@@ -114,8 +114,8 @@ let
   manualXsltprocOptions = toString [
     "--param section.autolabel 1"
     "--param section.label.includes.component.label 1"
-    "--stringparam html.stylesheet 'style.css overrides.css highlightjs/mono-blue.css'"
-    "--stringparam html.script './highlightjs/highlight.pack.js ./highlightjs/loader.js'"
+    "--stringparam html.stylesheet 'style.css overrides.css mono-blue.css'"
+    "--stringparam html.script 'highlight.pack.js highlight.load.js'"
     "--param xref.with.number.and.title 1"
     "--param toc.section.depth 3"
     "--stringparam admon.style ''"
@@ -124,7 +124,16 @@ let
     "--param use.id.as.filename 1"
     "--stringparam generate.toc 'book toc appendix toc'"
     "--stringparam chunk.toc ${toc}"
+    "--param highlight.source 1"
   ];
+
+  # The XSL template to use. This is an extension of the standard
+  # chunktoc.xsl template but with minor enhancements for highlight.js
+  # support.
+  docbookXsl = pkgs.substituteAll {
+    src = ../lib/nmd-chunktoc.xsl;
+    inherit docbook5_xsl;
+  };
 
   olinkDb = runXmlCommand "manual-olinkdb" { } ''
     mkdir $out
@@ -134,7 +143,7 @@ let
       --stringparam collect.xref.targets only \
       --stringparam targets.filename "$out/manual.db" \
       --nonet \
-      ${docbook5_xsl}/xml/xsl/docbook/xhtml/chunktoc.xsl \
+      ${docbookXsl} \
       ${manualCombined}/manual-combined.xml
 
     cat > "$out/olinkdb.xml" <<EOF
@@ -162,15 +171,17 @@ let
       ${manualXsltprocOptions} \
       --stringparam target.database.document "${olinkDb}/olinkdb.xml" \
       --nonet --output $dst/ \
-      ${docbook5_xsl}/xml/xsl/docbook/xhtml/chunktoc.xsl \
+      ${docbookXsl} \
       ${manualCombined}/manual-combined.xml
 
     mkdir -p $dst/images/callouts
     cp ${docbook5_xsl}/xml/xsl/docbook/images/callouts/*.svg $dst/images/callouts/
 
-    cp ${./style.css} $dst/style.css
-    cp ${./overrides.css} $dst/overrides.css
-    cp -r ${pkgs.documentation-highlighter} $dst/highlightjs
+    cp ${../static/style.css} $dst/style.css
+    cp ${../static/overrides.css} $dst/overrides.css
+    cp ${../static/highlightjs/highlight.pack.js} $dst/highlight.pack.js
+    cp ${../static/highlightjs/highlight.load.js} $dst/highlight.load.js
+    cp ${../static/highlightjs/mono-blue.css} $dst/mono-blue.css
   '';
 
   htmlOpenTool = { name ? "${pathName}-help" }:
