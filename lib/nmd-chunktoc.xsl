@@ -6,7 +6,7 @@
     xmlns="http://www.w3.org/1999/xhtml"
     version="1.0">
 
-  <xsl:import href="@docbook5_xsl@/xml/xsl/docbook/xhtml/chunktoc.xsl"/>
+  <xsl:import href="@docbook_xsl_ns@/xml/xsl/docbook/xhtml/chunktoc.xsl"/>
 
   <xsl:template name="apply-highlighting">
     <xsl:if test="@language != ''">

@@ -28,7 +28,7 @@ with lib;
 
 let
 
-  inherit (pkgs) docbook5 docbook5_xsl;
+  inherit (pkgs) docbook5 docbook-xsl-ns;
 
   docBookFromAsciiDocDirectory = pkgs.runCommand "converted-asciidoc" {
     nativeBuildInputs = [ (getBin pkgs.asciidoc) (getBin pkgs.libxslt) ];
@@ -132,7 +132,7 @@ let
   # support.
   docbookXsl = pkgs.substituteAll {
     src = ../lib/nmd-chunktoc.xsl;
-    inherit docbook5_xsl;
+    docbook_xsl_ns = docbook-xsl-ns;
   };
 
   olinkDb = runXmlCommand "manual-olinkdb" { } ''
@@ -149,7 +149,7 @@ let
     cat > "$out/olinkdb.xml" <<EOF
     <?xml version="1.0" encoding="utf-8"?>
     <!DOCTYPE targetset SYSTEM
-      "file://${docbook5_xsl}/xml/xsl/docbook/common/targetdatabase.dtd" [
+      "file://${docbook-xsl-ns}/xml/xsl/docbook/common/targetdatabase.dtd" [
       <!ENTITY manualtargets SYSTEM "file://$out/manual.db">
     ]>
     <targetset>
@@ -175,7 +175,7 @@ let
       ${manualCombined}/manual-combined.xml
 
     mkdir -p $dst/images/callouts
-    cp ${docbook5_xsl}/xml/xsl/docbook/images/callouts/*.svg $dst/images/callouts/
+    cp ${docbook-xsl-ns}/xml/xsl/docbook/images/callouts/*.svg $dst/images/callouts/
 
     cp ${../static/style.css} $dst/style.css
     cp ${../static/overrides.css} $dst/overrides.css
@@ -214,7 +214,7 @@ let
       --param man.endnotes.are.numbered 0 \
       --param man.break.after.slash 1 \
       --stringparam target.database.document "${olinkDb}/olinkdb.xml" \
-      ${docbook5_xsl}/xml/xsl/docbook/manpages/docbook.xsl \
+      ${docbook-xsl-ns}/xml/xsl/docbook/manpages/docbook.xsl \
       ${manualCombined}/man-pages-combined.xml
   '';
 
