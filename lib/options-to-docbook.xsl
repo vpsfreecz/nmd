@@ -48,7 +48,7 @@
                             <para>
                                 <emphasis>Default:</emphasis>
                                 <xsl:text> </xsl:text>
-                                <xsl:apply-templates select="attr[@name = 'default']" mode="top" />
+                                <xsl:apply-templates select="attr[@name = 'default']/*" mode="top" />
                             </para>
                         </xsl:if>
 
@@ -56,14 +56,7 @@
                             <para>
                                 <emphasis>Example:</emphasis>
                                 <xsl:text> </xsl:text>
-                                <xsl:choose>
-                                    <xsl:when test="attr[@name = 'example']/attrs[attr[@name = '_type' and string[@value = 'literalExample']]]">
-                                        <programlisting><xsl:value-of select="attr[@name = 'example']/attrs/attr[@name = 'text']/string/@value" /></programlisting>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:apply-templates select="attr[@name = 'example']" mode="top" />
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:apply-templates select="attr[@name = 'example']/*" mode="top" />
                             </para>
                         </xsl:if>
 
@@ -99,17 +92,35 @@
     </xsl:template>
 
 
-    <xsl:template match="*" mode="top">
+    <!-- Note, literalExample is temporarily supported for backwards compatibility. -->
+    <xsl:template match="attrs[attr[@name = '_type' and (string[@value = 'literalExpression'] or string[@value = 'literalExample'])]]" mode = "top">
         <xsl:choose>
-            <xsl:when test="string[contains(@value, '&#010;')]">
-<programlisting>
-<xsl:text>''
-</xsl:text><xsl:value-of select='str:replace(string/@value, "${", "&apos;&apos;${")' /><xsl:text>''</xsl:text></programlisting>
+            <xsl:when test="contains(attr[@name = 'text']/string/@value, '&#010;')">
+                <programlisting><xsl:value-of select="attr[@name = 'text']/string/@value" /></programlisting>
             </xsl:when>
             <xsl:otherwise>
-                <literal><xsl:apply-templates /></literal>
+                <literal><xsl:value-of select="attr[@name = 'text']/string/@value" /></literal>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+
+    <xsl:template match="attrs[attr[@name = '_type' and string[@value = 'literalDocBook']]]" mode = "top">
+        <xsl:value-of disable-output-escaping="yes" select="attr[@name = 'text']/string/@value" />
+    </xsl:template>
+
+
+    <xsl:template match="string[contains(@value, '&#010;')]" mode="top">
+        <programlisting>
+            <xsl:text>''&#010;</xsl:text>
+            <xsl:value-of select='str:replace(str:replace(@value, "&apos;&apos;", "&apos;&apos;&apos;"), "${", "&apos;&apos;${")' />
+            <xsl:text>''</xsl:text>
+        </programlisting>
+    </xsl:template>
+
+
+    <xsl:template match="*" mode="top">
+        <literal><xsl:apply-templates select="." /></literal>
     </xsl:template>
 
 
@@ -121,10 +132,10 @@
     <xsl:template match="string">
         <xsl:choose>
             <xsl:when test="(contains(@value, '&quot;') or contains(@value, '\')) and not(contains(@value, '&#010;'))">
-                <xsl:text>''</xsl:text><xsl:value-of select='str:replace(@value, "${", "&apos;&apos;${")' /><xsl:text>''</xsl:text>
+                <xsl:text>''</xsl:text><xsl:value-of select='str:replace(str:replace(@value, "&apos;&apos;", "&apos;&apos;&apos;"), "${", "&apos;&apos;${")' /><xsl:text>''</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:text>"</xsl:text><xsl:value-of select="str:replace(str:replace(str:replace(str:replace(@value, '\', '\\'), '&quot;', '\&quot;'), '&#010;', '\n'), '$', '\$')" /><xsl:text>"</xsl:text>
+                <xsl:text>"</xsl:text><xsl:value-of select="str:replace(str:replace(str:replace(str:replace(@value, '\', '\\'), '&quot;', '\&quot;'), '&#010;', '\n'), '${', '\${')" /><xsl:text>"</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -155,7 +166,8 @@
     </xsl:template>
 
 
-    <xsl:template match="attrs[attr[@name = '_type' and string[@value = 'literalExample']]]">
+    <!-- Note, literalExample is temporarily supported for backwards compatibility. -->
+    <xsl:template match="attrs[attr[@name = '_type' and (string[@value = 'literalExpression'] or string[@value = 'literalExample'])]]">
         <xsl:value-of select="attr[@name = 'text']/string/@value" />
     </xsl:template>
 
