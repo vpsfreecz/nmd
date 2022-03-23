@@ -59,7 +59,11 @@ let
 
   runXmlCommand = name: attrs: command:
     pkgs.runCommand name (attrs // {
-      nativeBuildInputs = [ (getBin pkgs.libxml2) (getBin pkgs.libxslt) ];
+      nativeBuildInputs = [
+        (pkgs.path + /pkgs/build-support/setup-hooks/compress-man-pages.sh)
+        (getBin pkgs.libxml2)
+        (getBin pkgs.libxslt)
+      ];
     }) command;
 
   manualCombined = runXmlCommand "manual-combined" { } ''
@@ -216,6 +220,8 @@ let
       --stringparam target.database.document "${olinkDb}/olinkdb.xml" \
       ${docbook-xsl-ns}/xml/xsl/docbook/manpages/docbook.xsl \
       ${manualCombined}/man-pages-combined.xml
+
+    compressManPages $out
   '';
 
 in {
