@@ -189,25 +189,39 @@ let
   '';
 
   htmlOpenTool = { name ? "${pathName}-help" }:
-    pkgs.writeShellScriptBin name ''
-      set -euo pipefail
+    let
+      helpScript = pkgs.writeShellScriptBin name ''
+        set -euo pipefail
 
-      if [[ ! -v BROWSER || -z $BROWSER ]]; then
-        for candidate in xdg-open open w3m; do
-          BROWSER="$(type -P $candidate || true)"
-          if [[ -x $BROWSER ]]; then
-            break;
-          fi
-        done
-      fi
+        if [[ ! -v BROWSER || -z $BROWSER ]]; then
+          for candidate in xdg-open open w3m; do
+            BROWSER="$(type -P $candidate || true)"
+            if [[ -x $BROWSER ]]; then
+              break;
+            fi
+          done
+        fi
 
-      if [[ ! -v BROWSER || -z $BROWSER ]]; then
-        echo "$0: unable to start a web browser; please set \$BROWSER"
-        exit 1
-      else
-        exec "$BROWSER" "${html}/share/doc/${pathName}/index.html"
-      fi
-    '';
+        if [[ ! -v BROWSER || -z $BROWSER ]]; then
+          echo "$0: unable to start a web browser; please set \$BROWSER"
+          exit 1
+        else
+          exec "$BROWSER" "${html}/share/doc/${pathName}/index.html"
+        fi
+      '';
+
+      desktopItem = pkgs.makeDesktopItem {
+        name = "${pathName}-manual";
+        desktopName = "${pathName} Manual";
+        genericName = "View ${pathName} documentation in a web browser";
+        icon = "nix-snowflake";
+        exec = "${helpScript}/bin/${name}";
+        categories = [ "System" ];
+      };
+    in pkgs.symlinkJoin {
+      inherit name;
+      paths = [ helpScript desktopItem ];
+    };
 
   manPages = runXmlCommand "man-pages" { allowedReferences = [ "out" ]; } ''
     # Generate manpages.
