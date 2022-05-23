@@ -5,6 +5,9 @@
 # e.g., install documentation to `share/doc/<name>`.
 pathName
 
+# The name of the project being documented. Default is to use `pathName`.
+, projectName ? pathName
+
 # List of modules documentation as produced by `buildModulesDocs`.
 , modulesDocs ? [ ]
 
@@ -212,8 +215,8 @@ let
 
       desktopItem = pkgs.makeDesktopItem {
         name = "${pathName}-manual";
-        desktopName = "${pathName} Manual";
-        genericName = "View ${pathName} documentation in a web browser";
+        desktopName = "${projectName} Manual";
+        genericName = "View ${projectName} documentation in a web browser";
         icon = "nix-snowflake";
         exec = "${helpScript}/bin/${name}";
         categories = [ "System" ];
