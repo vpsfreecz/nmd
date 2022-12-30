@@ -11,6 +11,14 @@ generate documentation for other projects that use the
 
 Note, this project is still immature and lack some features.
 
+== Development
+
+The code is formatted using https://github.com/serokell/nixfmt[nixfmt].
+The formatting can be applied by running
+
+[source,console]
+$ nix develop -c p-format
+
 == Example output
 
 https://rycee.gitlab.io/home-manager/[Home Manager Manual]
