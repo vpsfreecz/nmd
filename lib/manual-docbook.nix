@@ -8,7 +8,7 @@ pathName
 # The name of the project being documented. Default is to use `pathName`.
 , projectName ? pathName
 
-# List of modules documentation as produced by `buildModulesDocs`.
+  # List of modules documentation as produced by `buildModulesDocs`.
 , modulesDocs ? [ ]
 
   # Directory of DocBook documents. This directory is expected to
@@ -33,7 +33,8 @@ let
 
   inherit (pkgs) docbook5;
   # See https://github.com/NixOS/nixpkgs/pull/166509
-  docbook-xsl-ns = pkgs.docbook-xsl-ns.override { withManOptDedupPatch = true; };
+  docbook-xsl-ns =
+    pkgs.docbook-xsl-ns.override { withManOptDedupPatch = true; };
 
   docBookFromAsciiDocDirectory = pkgs.runCommand "converted-asciidoc" {
     nativeBuildInputs = [ (getBin pkgs.asciidoc) (getBin pkgs.libxslt) ];
