@@ -39,9 +39,28 @@ let
 
   evaluatedModules = evalModules { inherit modules; };
 
-  optionsDocs = (map cleanUpOption (sort moduleDocCompare
+  # Option documentation with non-DocBook markup allowed.
+  rawOptionsDocs = (map cleanUpOption (sort moduleDocCompare
     (filter (opt: opt.visible && !opt.internal)
       (optionAttrSetToDocList evaluatedModules.options))));
+
+  rawOptionsJson =
+    builtins.toFile "raw-options.json" (builtins.toJSON rawOptionsDocs);
+
+  optionsJson = pkgs.runCommand "options.json" {
+    nativeBuildInputs = [ (pkgs.python3.withPackages (p: [ p.mistune ])) ];
+    rawOptionsJson = builtins.toJSON rawOptionsDocs;
+    rawOverridesJson = "{}";
+    passAsFile = [ "rawOptionsJson" "rawOverridesJson" ];
+  } ''
+    python ${./docbookify-options-json.py} \
+           ${rawOptionsJson} \
+           $rawOverridesJsonPath \
+           > $out
+  '';
+
+  # The option documentation with only DocBook markup.
+  optionsDocs = builtins.fromJSON (builtins.readFile optionsJson);
 
   moduleDocCompare = a: b:
     let

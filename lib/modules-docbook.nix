@@ -31,15 +31,17 @@ with lib;
 
 let
 
-  optionsXml = pkgs.writeText "nmd-options.xml" (builtins.toXML optionsDocs);
+  optionsXml = builtins.toFile "options.xml" (builtins.toXML optionsDocs);
 
   optionsDocBook = pkgs.runCommand "options-db.xml" {
     nativeBuildInputs = [ (getBin pkgs.libxslt) ];
   } ''
-    mkdir $out
+    mkdir -p $out/nmd-result
+
     xsltproc \
       --stringparam elementId '${id}' \
       --stringparam optionIdPrefix '${optionIdPrefix}' \
+      --nonet \
       -o $out/nmd-result/${id}.xml \
       ${./options-to-docbook.xsl} ${optionsXml}
   '';

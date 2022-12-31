@@ -19,20 +19,21 @@
             shopt -s globstar
             set -euo pipefail
 
-            check=""
             case ''${1:-} in
-              -h) echo "$0 [-c]"  ;;
-              -c) check="-c"      ;;
+              -h) echo "$0 [-c]" ;;
+              -c) check=""       ;;
             esac
 
-            PATH=${with pkgs; nixpkgs.lib.makeBinPath [ nixfmt ]}
+            PATH=${with pkgs; nixpkgs.lib.makeBinPath [ nixfmt yapf ]}
 
-            nixfmt $check **/*.nix
+            nixfmt ''${check+-c} **/*.nix
+            yapf ''${check--i} ''${check+-d} **/*.py
           '';
         in {
           default = pkgs.mkShell {
             name = "dev-shell";
-            nativeBuildInputs = [ pFormat ];
+            nativeBuildInputs =
+              [ pFormat (pkgs.python3.withPackages (p: [ p.mistune ])) ];
           };
         });
     };
