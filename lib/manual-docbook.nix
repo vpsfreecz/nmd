@@ -41,8 +41,9 @@ let
   } ''
     function convert() {
       mkdir -p $(dirname $2)
-      asciidoc -s -d ${documentType} -b docbook --out-file - "$1" \
-        | xsltproc -o "$2" ${docbook5}/share/xml/docbook-5.0/tools/db4-upgrade.xsl -
+      asciidoc -s -d ${documentType} -b docbook5 --out-file=- "$1" \
+        | sed '1,1 { s!>! xmlns:xlink="http://www.w3.org/1999/xlink">! }' \
+        > "$2"
     }
 
     mkdir $out
