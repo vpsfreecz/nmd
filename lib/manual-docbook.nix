@@ -37,7 +37,7 @@ let
     pkgs.docbook-xsl-ns.override { withManOptDedupPatch = true; };
 
   docBookFromAsciiDocDirectory = pkgs.runCommand "converted-asciidoc" {
-    nativeBuildInputs = [ (getBin pkgs.asciidoc) (getBin pkgs.libxslt) ];
+    nativeBuildInputs = [ (getBin pkgs.asciidoc) ];
   } ''
     function convert() {
       mkdir -p $(dirname $2)
