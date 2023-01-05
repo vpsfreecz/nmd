@@ -132,6 +132,7 @@ let
     "--stringparam admon.style ''"
     "--stringparam callout.graphics.extension .svg"
     "--stringparam current.docid manual"
+    "--param generate.consistent.ids 1"
     "--param use.id.as.filename 1"
     "--stringparam generate.toc 'book toc appendix toc'"
     "--stringparam chunk.toc ${toc}"
