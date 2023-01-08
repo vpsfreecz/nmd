@@ -25,17 +25,23 @@
 #     channelName = "myproject"
 , channelName
 
-, optionsDocs }:
+, optionsJson }:
 
 with lib;
 
 let
 
-  optionsXml = builtins.toFile "options.xml" (builtins.toXML optionsDocs);
-
   optionsDocBook = pkgs.runCommand "options-db.xml" {
     nativeBuildInputs = [ (getBin pkgs.libxslt) ];
   } ''
+    export NIX_STORE_DIR=$TMPDIR/store
+    export NIX_STATE_DIR=$TMPDIR/state
+    ${pkgs.nix}/bin/nix-instantiate \
+      --eval --xml --strict \
+      --expr '{file}: builtins.fromJSON (builtins.readFile file)' \
+      --argstr file ${optionsJson} \
+      > options.xml
+
     mkdir -p $out/nmd-result
 
     xsltproc \
@@ -43,7 +49,7 @@ let
       --stringparam optionIdPrefix '${optionIdPrefix}' \
       --nonet \
       -o $out/nmd-result/${id}.xml \
-      ${./options-to-docbook.xsl} ${optionsXml}
+      ${./options-to-docbook.xsl} options.xml
   '';
 
 in optionsDocBook

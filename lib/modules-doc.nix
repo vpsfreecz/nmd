@@ -142,10 +142,10 @@ in {
 
   # Slightly cleaned up JSON representation of the module
   # documentation.
-  json = import ./modules-json.nix { inherit pkgs lib optionsDocs; };
+  json = import ./modules-json.nix { inherit pkgs lib optionsJson; };
 
   # DocBook representation of the module documentation, suitable for
   # inclusion into a DocBook document.
   docBook = import ./modules-docbook.nix
-    ({ inherit pkgs lib optionsDocs mkModuleUrl channelName; } // docBook);
+    ({ inherit pkgs lib optionsJson mkModuleUrl channelName; } // docBook);
 }

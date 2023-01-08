@@ -1,22 +1,16 @@
-{ pkgs, lib, optionsDocs }:
+{ pkgs, lib, optionsJson }:
 
 with lib;
 
 let
 
-  jsonData = let
-    trimAttrs = flip removeAttrs [ "name" "visible" "internal" ];
-    attributify = opt: {
-      inherit (opt) name;
-      value = trimAttrs opt;
-    };
-  in listToAttrs (map attributify optionsDocs);
-
   jsonFile = { path ? "options.json" }:
-    pkgs.writeTextFile {
-      name = builtins.baseNameOf path;
-      destination = "/${path}";
-      text = builtins.unsafeDiscardStringContext (builtins.toJSON jsonData);
-    };
+    pkgs.runCommand (builtins.baseNameOf path) { } ''
+      dest=$out/${lib.escapeShellArg path}
+      mkdir -p "$(dirname "$dest")"
+      ${pkgs.jq}/bin/jq -c \
+        'map({key: .name, value: del(.name, .visible, .internal)}) | from_entries' \
+        ${optionsJson} > "$dest"
+    '';
 
 in makeOverridable jsonFile { }
