@@ -302,7 +302,9 @@ def docbookify_options_json():
                 cur[ok] = ov
 
     # don't output \u escape sequences for compatibility with Nix 2.3
-    json.dump(list(convertMD(unpivot(options))), fp=sys.stdout, ensure_ascii=False)
+    json.dump(list(convertMD(unpivot(options))),
+              fp=sys.stdout,
+              ensure_ascii=False)
 
 
 if __name__ == '__main__':
