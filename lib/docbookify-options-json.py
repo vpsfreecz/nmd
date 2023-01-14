@@ -263,13 +263,15 @@ def convertMD(options: List[JSON]) -> List[JSON]:
             if optionIs(option, 'description', 'mdDoc'):
                 option['description'] = convertString(
                     name, option['description']['text'])
-            elif optionIs(option, 'example', 'literalMD'):
+
+            if optionIs(option, 'example', 'literalMD'):
                 docbook = convertString(name, option['example']['text'])
                 option['example'] = {
                     '_type': 'literalDocBook',
                     'text': docbook
                 }
-            elif optionIs(option, 'default', 'literalMD'):
+
+            if optionIs(option, 'default', 'literalMD'):
                 docbook = convertString(name, option['default']['text'])
                 option['default'] = {
                     '_type': 'literalDocBook',
