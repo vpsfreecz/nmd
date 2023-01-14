@@ -36,10 +36,8 @@
                     </term>
 
                     <listitem>
-                        <para>
-                            <xsl:value-of disable-output-escaping="yes"
-                                          select="attr[@name = 'description']/string/@value" />
-                        </para>
+                        <xsl:value-of disable-output-escaping="yes"
+                                      select="attr[@name = 'description']/string/@value" />
 
                         <xsl:if test="attr[@name = 'type']">
                             <para>

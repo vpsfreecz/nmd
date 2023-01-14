@@ -78,7 +78,7 @@ class Renderer(mistune.renderers.BaseRenderer):
         return escape(text)
 
     def paragraph(self, text):
-        return text + "\n\n"
+        return f"<simpara>{text}</simpara>\n"
 
     def newline(self):
         return "<literallayout>\n</literallayout>"
@@ -251,11 +251,20 @@ def convertMD(options: List[JSON]) -> List[JSON]:
             print(f"error in {path}")
             raise
 
+    # Removes a wrapping <simpara> element, if one exists. This is useful, e.g.,
+    # when converted Markdown text needs to be embedded in context that
+    # disallows <simpara>.
+    def unwrapSimpara(s: str) -> str:
+        return s.removeprefix("<simpara>").removesuffix("</simpara>")
+
     def optionIs(option: Dict[str, Any], key: str, typ: str) -> bool:
         if key not in option: return False
         if type(option[key]) != dict: return False
         if '_type' not in option[key]: return False
         return option[key]['_type'] == typ
+
+    def optionIsRawText(option: Dict[str, Any], key: str) -> bool:
+        return key in option and type(option[key]) == str
 
     for option in options:
         name = option['name']
@@ -263,19 +272,26 @@ def convertMD(options: List[JSON]) -> List[JSON]:
             if optionIs(option, 'description', 'mdDoc'):
                 option['description'] = convertString(
                     name, option['description']['text'])
+            elif optionIsRawText(option, 'description'):
+                # Wrap a plain DocBook description inside a <para> element to
+                # maintain backwards compatibility. Basically, this prevents
+                # errors when a user uses the `</para><para>` idiom to create
+                # paragraph breaks.
+                docbook = option['description'].rstrip()
+                option['description'] = f"<para>{docbook}</para>"
 
             if optionIs(option, 'example', 'literalMD'):
                 docbook = convertString(name, option['example']['text'])
                 option['example'] = {
                     '_type': 'literalDocBook',
-                    'text': docbook
+                    'text': unwrapSimpara(docbook)
                 }
 
             if optionIs(option, 'default', 'literalMD'):
                 docbook = convertString(name, option['default']['text'])
                 option['default'] = {
                     '_type': 'literalDocBook',
-                    'text': docbook
+                    'text': unwrapSimpara(docbook)
                 }
         except Exception as e:
             raise Exception(f"Failed to render option {name}: {str(e)}")
