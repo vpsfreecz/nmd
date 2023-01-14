@@ -6,7 +6,9 @@ import json
 import mistune  # for MD conversion
 import re
 import sys
+from asciidoc.api import AsciiDocAPI
 from enum import Enum
+from io import StringIO
 from typing import Any, Dict, List
 from xml.sax.saxutils import escape, quoteattr
 
@@ -234,17 +236,32 @@ def p_admonition(md):
     md.block.rules.append('admonition')
 
 
-# converts in-place!
-def convertMD(options: List[JSON]) -> List[JSON]:
+# Converts option documentation texts such that it contains only plain DocBook
+# markup. Specifically, this will expand Markdown and AsciiDoc texts.
+def convertOptions(options: List[JSON]) -> List[JSON]:
     md = mistune.create_markdown(renderer=Renderer(),
                                  plugins=[
                                      p_command, p_file, p_var, p_env, p_option,
                                      p_manpage, p_admonition
                                  ])
+    adoc = AsciiDocAPI()
+    adoc.options('--no-header-footer')
 
-    def convertString(path: str, text: str) -> str:
+    def convertMarkdown(path: str, text: str) -> str:
         try:
             rendered = md(text)
+            # keep trailing spaces so we can diff the generated XML to check for conversion bugs.
+            return rendered.rstrip() + text[len(text.rstrip()):]
+        except:
+            print(f"error in {path}")
+            raise
+
+    def convertAsciiDoc(path: str, text: str) -> str:
+        try:
+            infile = StringIO(text)
+            outfile = StringIO()
+            adoc.execute(infile, outfile, backend='docbook5')
+            rendered = outfile.getvalue()
             # keep trailing spaces so we can diff the generated XML to check for conversion bugs.
             return rendered.rstrip() + text[len(text.rstrip()):]
         except:
@@ -269,8 +286,12 @@ def convertMD(options: List[JSON]) -> List[JSON]:
     for option in options:
         name = option['name']
         try:
+            # Handle the `description` field.
             if optionIs(option, 'description', 'mdDoc'):
-                option['description'] = convertString(
+                option['description'] = convertMarkdown(
+                    name, option['description']['text'])
+            elif optionIs(option, 'description', 'asciiDoc'):
+                option['description'] = convertAsciiDoc(
                     name, option['description']['text'])
             elif optionIsRawText(option, 'description'):
                 # Wrap a plain DocBook description inside a <para> element to
@@ -280,15 +301,31 @@ def convertMD(options: List[JSON]) -> List[JSON]:
                 docbook = option['description'].rstrip()
                 option['description'] = f"<para>{docbook}</para>"
 
+            # Handle the `example` field.
             if optionIs(option, 'example', 'literalMD'):
-                docbook = convertString(name, option['example']['text'])
+                docbook = convertMarkdown(name, option['example']['text'])
+                option['example'] = {
+                    '_type': 'literalDocBook',
+                    'text': unwrapSimpara(docbook)
+                }
+            elif optionIs(option, 'example', 'literalAsciiDoc'):
+                docbook = unwrapSimpara(
+                    convertAsciiDoc(name, option['example']['text']))
                 option['example'] = {
                     '_type': 'literalDocBook',
                     'text': unwrapSimpara(docbook)
                 }
 
+            # Handle the `default` field.
             if optionIs(option, 'default', 'literalMD'):
-                docbook = convertString(name, option['default']['text'])
+                docbook = convertMarkdown(name, option['default']['text'])
+                option['default'] = {
+                    '_type': 'literalDocBook',
+                    'text': unwrapSimpara(docbook)
+                }
+            elif optionIs(option, 'default', 'literalAsciiDoc'):
+                docbook = unwrapSimpara(
+                    convertAsciiDoc(name, option['default']['text']))
                 option['default'] = {
                     '_type': 'literalDocBook',
                     'text': unwrapSimpara(docbook)
@@ -320,7 +357,7 @@ def docbookify_options_json():
                 cur[ok] = ov
 
     # don't output \u escape sequences for compatibility with Nix 2.3
-    json.dump(list(convertMD(unpivot(options))),
+    json.dump(list(convertOptions(unpivot(options))),
               fp=sys.stdout,
               ensure_ascii=False)
 

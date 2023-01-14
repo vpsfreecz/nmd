@@ -32,8 +32,11 @@
         in {
           default = pkgs.mkShell {
             name = "dev-shell";
-            nativeBuildInputs =
-              [ pFormat (pkgs.python3.withPackages (p: [ p.mistune ])) ];
+            nativeBuildInputs = [
+              pFormat
+              pkgs.asciidoc
+              (pkgs.python3.withPackages (p: [ p.mistune ]))
+            ];
           };
         });
     };

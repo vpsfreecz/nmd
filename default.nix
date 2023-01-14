@@ -32,6 +32,19 @@ let
 in {
   inherit scrubDerivations;
 
+  # Indicates that the given text should be interpreted as AsciiDoc markup.
+  asciiDoc = text: {
+    _type = "asciiDoc";
+    inherit text;
+  };
+
+  # Indicates that the given text should be interpreted as AsciiDoc markup and
+  # used in a literal context.
+  literalAsciiDoc = text: {
+    _type = "literalAsciiDoc";
+    inherit text;
+  };
+
   buildModulesDocs = import ./lib/modules-doc.nix { inherit lib pkgs; };
   buildDocBookDocs = import ./lib/manual-docbook.nix { inherit lib pkgs; };
 }

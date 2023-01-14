@@ -48,7 +48,8 @@ let
     builtins.toFile "raw-options.json" (builtins.toJSON rawOptionsDocs);
 
   optionsJson = pkgs.runCommand "options.json" {
-    nativeBuildInputs = [ (pkgs.python3.withPackages (p: [ p.mistune ])) ];
+    nativeBuildInputs =
+      [ pkgs.asciidoc (pkgs.python3.withPackages (p: [ p.mistune ])) ];
     rawOptionsJson = builtins.toJSON rawOptionsDocs;
     rawOverridesJson = "{}";
     passAsFile = [ "rawOptionsJson" "rawOverridesJson" ];
