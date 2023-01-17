@@ -125,8 +125,8 @@ let
   manualXsltprocOptions = toString [
     "--param section.autolabel 1"
     "--param section.label.includes.component.label 1"
-    "--stringparam html.stylesheet 'style.css overrides.css mono-blue.css'"
-    "--stringparam html.script 'highlight.pack.js highlight.load.js'"
+    "--stringparam html.stylesheet 'style.css'"
+    "--stringparam html.script 'highlight.min.js highlight.load.js'"
     "--param xref.with.number.and.title 1"
     "--param toc.section.depth 3"
     "--stringparam admon.style ''"
@@ -186,14 +186,21 @@ let
       ${docbookXsl} \
       ${manualCombined}/manual-combined.xml
 
+    # Make the manual styling work better on mobile devices.
+    substituteInPlace $dst/*.html \
+      --replace '<head>' \
+                '<head><meta name="viewport" content="width=device-width, initial-scale=1.0">'
+
     mkdir -p $dst/images/callouts
     cp ${docbook-xsl-ns}/xml/xsl/docbook/images/callouts/*.svg $dst/images/callouts/
 
     cp ${../static/style.css} $dst/style.css
-    cp ${../static/overrides.css} $dst/overrides.css
-    cp ${../static/highlightjs/highlight.pack.js} $dst/highlight.pack.js
     cp ${../static/highlightjs/highlight.load.js} $dst/highlight.load.js
-    cp ${../static/highlightjs/mono-blue.css} $dst/mono-blue.css
+    cp ${../static/highlightjs/highlight.min.js} $dst/highlight.min.js
+    cp ${../static/highlightjs/tomorrow.min.css} $dst/tomorrow.min.css
+    cp ${
+      ../static/highlightjs/tomorrow-night.min.css
+    } $dst/tomorrow-night.min.css
   '';
 
   htmlOpenTool = { name ? "${pathName}-help" }:
