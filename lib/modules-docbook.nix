@@ -34,9 +34,8 @@ let
   optionsDocBook = pkgs.runCommand "options-db.xml" {
     nativeBuildInputs = [ (getBin pkgs.libxslt) ];
   } ''
-    export NIX_STORE_DIR=$TMPDIR/store
-    export NIX_STATE_DIR=$TMPDIR/state
     ${pkgs.nix}/bin/nix-instantiate \
+      --store dummy:// \
       --eval --xml --strict \
       --expr '{file}: builtins.fromJSON (builtins.readFile file)' \
       --argstr file ${optionsJson} \
