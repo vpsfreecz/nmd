@@ -34,6 +34,10 @@ let
   optionsDocBook = pkgs.runCommand "options-db.xml" {
     nativeBuildInputs = [ (getBin pkgs.libxslt) ];
   } ''
+    # Make sure we don't try to access paths outside the sandbox.
+    # This should be redundant with --store dummy:// if not for Nix bugs...
+    export NIX_STORE_DIR=$TMPDIR/store
+    export NIX_STATE_DIR=$TMPDIR/state
     ${pkgs.nix}/bin/nix-instantiate \
       --store dummy:// \
       --eval --xml --strict \
