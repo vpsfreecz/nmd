@@ -39,7 +39,10 @@ let
     export NIX_STORE_DIR=$TMPDIR/store
     export NIX_STATE_DIR=$TMPDIR/state
     nix-instantiate \
-      --store dummy:// \
+      ${
+        optionalString (versionAtLeast pkgs.nix.version "2.4")
+        "--store dummy://"
+      } \
       --eval --xml --strict \
       --expr '{file}: builtins.fromJSON (builtins.readFile file)' \
       --argstr file ${optionsJson} \
