@@ -162,6 +162,11 @@ pre {
     margin-bottom: 1.5rem;
     padding: 6px;
     overflow: auto;
+
+    // The callout markers should not be selectable.
+    span img {
+        user-select: none;
+    }
 }
 
 td, th {
