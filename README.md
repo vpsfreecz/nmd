@@ -26,6 +26,15 @@ by running
 $ nix develop -c p-format
 ```
 
+## Examples
+
+The `examples` directory gives some demonstration of how to use nmd.
+The examples can be built using `nix-build`, for example,
+
+``` console
+$ nix-build ./example/minimal -A html
+```
+
 ## Example output
 
 [Home Manager Manual](https://rycee.gitlab.io/home-manager/)
