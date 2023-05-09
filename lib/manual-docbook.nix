@@ -78,8 +78,11 @@ let
 
     xmllint --xinclude \
       --output $out/manual-combined.xml ${manualXml}
-    xmllint --xinclude --noxincludenode \
-      --output $out/man-pages-combined.xml ${manPagesXml}
+
+    if [[ -e ${manPagesXml} ]]; then
+      xmllint --xinclude --noxincludenode \
+        --output $out/man-pages-combined.xml ${manPagesXml}
+    fi
 
     # outputs the context of an xmllint error output
     # LEN lines around the failing line are printed
@@ -117,7 +120,10 @@ let
     }
 
     lintrng $out/manual-combined.xml
-    lintrng $out/man-pages-combined.xml
+
+    if [[ -e $out/man-pages-combined.xml ]]; then
+      lintrng "$out/man-pages-combined.xml"
+    fi
   '';
 
   toc = builtins.toFile "toc.xml" chunkToc;
