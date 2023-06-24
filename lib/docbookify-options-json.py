@@ -62,10 +62,11 @@ admonitions = {
     '.note': 'note'
 }
 
-
 # Allowed child elements for the DocBook listitem element. See
 # https://tdg.docbook.org/tdg/5.1/listitem.html
-ALLOWED_LISTITEM_CHILD = re.compile('<(?:address|anchor|annotation|bibliolist|blockquote|bridgehead|calloutlist|caution|classsynopsis|cmdsynopsis|constraintdef|constructorsynopsis|destructorsynopsis|epigraph|equation|example|fieldsynopsis|figure|formalpara|funcsynopsis|glosslist|important|indexterm|indexterm|indexterm|informalequation|informalexample|informalfigure|informaltable|informaltable|itemizedlist|literallayout|mediaobject|methodsynopsis|msgset|note|orderedlist|para|procedure|productionset|programlisting|programlistingco|qandaset|remark|revhistory|screen|screenco|screenshot|segmentedlist|sidebar|simpara|simplelist|synopsis|table|table|task|tip|variablelist|warning)[> ]')
+ALLOWED_LISTITEM_CHILD = re.compile(
+    '<(?:address|anchor|annotation|bibliolist|blockquote|bridgehead|calloutlist|caution|classsynopsis|cmdsynopsis|constraintdef|constructorsynopsis|destructorsynopsis|epigraph|equation|example|fieldsynopsis|figure|formalpara|funcsynopsis|glosslist|important|indexterm|indexterm|indexterm|informalequation|informalexample|informalfigure|informaltable|informaltable|itemizedlist|literallayout|mediaobject|methodsynopsis|msgset|note|orderedlist|para|procedure|productionset|programlisting|programlistingco|qandaset|remark|revhistory|screen|screenco|screenshot|segmentedlist|sidebar|simpara|simplelist|synopsis|table|table|task|tip|variablelist|warning)[> ]'
+)
 
 
 class Renderer(mistune.renderers.BaseRenderer):
@@ -303,10 +304,12 @@ def convertOptions(options: List[JSON]) -> List[JSON]:
             elif optionIs(option, 'description', 'asciiDoc'):
                 option['description'] = convertAsciiDoc(
                     name, option['description']['text'])
-            elif optionIsRawText(option, 'description') and name == '_module.args':
+            elif optionIsRawText(option,
+                                 'description') and name == '_module.args':
                 # Special case for Nixpkgs' _module.args, which is Markdown even
                 # without marking it as such.
-                option['description'] = convertMarkdown(name, option['description'])
+                option['description'] = convertMarkdown(
+                    name, option['description'])
             elif optionIsRawText(option, 'description'):
                 # Wrap a plain DocBook description inside a <para> element to
                 # maintain backwards compatibility. Basically, this prevents
