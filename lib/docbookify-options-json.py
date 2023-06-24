@@ -287,7 +287,12 @@ def convertOptions(options: List[JSON]) -> List[JSON]:
         name = option['name']
         try:
             # Handle the `description` field.
-            if optionIs(option, 'description', 'mdDoc'):
+            if name == '_module.args':
+                # Unfortunately we'll need to skip the description of Nixpkgs'
+                # _module.args option for now. It uses some special Markdown
+                # flavor that is not yet supported by this tool.
+                option['description'] = ''
+            elif optionIs(option, 'description', 'mdDoc'):
                 option['description'] = convertMarkdown(
                     name, option['description']['text'])
             elif optionIs(option, 'description', 'asciiDoc'):
