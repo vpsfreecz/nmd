@@ -31,10 +31,7 @@ with lib;
 
 let
 
-  inherit (pkgs) docbook5;
-  # See https://github.com/NixOS/nixpkgs/pull/166509
-  docbook-xsl-ns =
-    pkgs.docbook-xsl-ns.override { withManOptDedupPatch = true; };
+  inherit (pkgs) docbook5 docbook-xsl-ns;
 
   docBookFromAsciiDocDirectory = pkgs.runCommand "converted-asciidoc" {
     nativeBuildInputs = [ (getBin pkgs.asciidoc) ];

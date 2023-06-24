@@ -28,11 +28,13 @@
                         )
                     )" />
                 <varlistentry>
-                    <term xlink:href="#{$id}">
+                    <term>
                         <xsl:attribute name="xml:id"><xsl:value-of select="$id"/></xsl:attribute>
-                        <option>
-                            <xsl:value-of select="attr[@name = 'name']/string/@value" />
-                        </option>
+                        <link xlink:href="#{$id}">
+                            <option>
+                                <xsl:value-of select="attr[@name = 'name']/string/@value" />
+                            </option>
+                        </link>
                     </term>
 
                     <listitem>
