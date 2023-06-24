@@ -1,0 +1,9 @@
+image: nixos/unstable
+sources:
+  - https://git.sr.ht/~rycee/nmd
+environment:
+  NIX_CONFIG: "experimental-features = nix-command flakes"
+tasks:
+  - check: |
+      cd nmd
+      nix run .#p-format -- -c
