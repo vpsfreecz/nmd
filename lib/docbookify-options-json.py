@@ -63,6 +63,11 @@ admonitions = {
 }
 
 
+# Allowed child elements for the DocBook listitem element. See
+# https://tdg.docbook.org/tdg/5.1/listitem.html
+ALLOWED_LISTITEM_CHILD = re.compile('<(?:address|anchor|annotation|bibliolist|blockquote|bridgehead|calloutlist|caution|classsynopsis|cmdsynopsis|constraintdef|constructorsynopsis|destructorsynopsis|epigraph|equation|example|fieldsynopsis|figure|formalpara|funcsynopsis|glosslist|important|indexterm|indexterm|indexterm|informalequation|informalexample|informalfigure|informaltable|informaltable|itemizedlist|literallayout|mediaobject|methodsynopsis|msgset|note|orderedlist|para|procedure|productionset|programlisting|programlistingco|qandaset|remark|revhistory|screen|screenco|screenshot|segmentedlist|sidebar|simpara|simplelist|synopsis|table|table|task|tip|variablelist|warning)[> ]')
+
+
 class Renderer(mistune.renderers.BaseRenderer):
 
     def _get_method(self, name):
@@ -114,7 +119,12 @@ class Renderer(mistune.renderers.BaseRenderer):
         return f"<itemizedlist>\n{text}\n</itemizedlist>"
 
     def list_item(self, text, level):
-        return f"<listitem><para>{text}</para></listitem>\n"
+        # If the list item does not contain an allowed element then wrap it in a
+        # paragraph.
+        if not ALLOWED_LISTITEM_CHILD.match(text):
+            return f"<listitem><para>{text}</para></listitem>\n"
+        else:
+            return f"<listitem>{text}</listitem>\n"
 
     def block_text(self, text):
         return text
@@ -287,17 +297,16 @@ def convertOptions(options: List[JSON]) -> List[JSON]:
         name = option['name']
         try:
             # Handle the `description` field.
-            if name == '_module.args':
-                # Unfortunately we'll need to skip the description of Nixpkgs'
-                # _module.args option for now. It uses some special Markdown
-                # flavor that is not yet supported by this tool.
-                option['description'] = ''
-            elif optionIs(option, 'description', 'mdDoc'):
+            if optionIs(option, 'description', 'mdDoc'):
                 option['description'] = convertMarkdown(
                     name, option['description']['text'])
             elif optionIs(option, 'description', 'asciiDoc'):
                 option['description'] = convertAsciiDoc(
                     name, option['description']['text'])
+            elif optionIsRawText(option, 'description') and name == '_module.args':
+                # Special case for Nixpkgs' _module.args, which is Markdown even
+                # without marking it as such.
+                option['description'] = convertMarkdown(name, option['description'])
             elif optionIsRawText(option, 'description'):
                 # Wrap a plain DocBook description inside a <para> element to
                 # maintain backwards compatibility. Basically, this prevents
