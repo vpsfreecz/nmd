@@ -18,6 +18,4 @@ let
     '';
   };
 
-in {
-  inherit (docs) html htmlOpenTool;
-}
+in { inherit (docs) html htmlOpenTool; }
