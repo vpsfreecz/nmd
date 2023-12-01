@@ -44,8 +44,8 @@
               echo "Generated ./static/style.css"
             '';
 
-            # Very basic script to re-start the server and perform Tailwind CSS
-            # export on file changes.
+            # Very basic script to re-start the server and run rsass on file
+            # changes.
             p-watch = pkgs.writeShellScriptBin "p-watch" ''
               set -euo pipefail
 
