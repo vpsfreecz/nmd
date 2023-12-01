@@ -295,7 +295,7 @@ div.warning {
 }
 
 /** The console prompt, e.g., `$` and `#` should not be selectable. */
-.programlisting.console .hljs-meta {
+.programlisting.language-shell .hljs-meta.prompt_ {
     user-select: none;
 }
 
