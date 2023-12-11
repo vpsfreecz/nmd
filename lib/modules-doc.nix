@@ -44,9 +44,22 @@ let
   rawOptionsJson =
     builtins.toFile "raw-options.json" (builtins.toJSON rawOptionsDocs);
 
+  optionsPython = pkgs.python3.override {
+    packageOverrides = self: super: {
+      mistune = super.mistune.overridePythonAttrs (old: rec {
+        version = "2.0.5";
+        src = pkgs.fetchPypi {
+          inherit (old) pname;
+          inherit version;
+          hash = "sha256-AkYRPLJJLbh1xr5Wl0p8iTMzvybNkokchfYxUc7gnTQ=";
+        };
+      });
+    };
+  };
+
   optionsJson = pkgs.runCommand "options.json" {
     nativeBuildInputs =
-      [ pkgs.asciidoc (pkgs.python3.withPackages (p: [ p.mistune ])) ];
+      [ pkgs.asciidoc (optionsPython.withPackages (p: [ p.mistune ])) ];
     rawOptionsJson = builtins.toJSON rawOptionsDocs;
     rawOverridesJson = "{}";
     passAsFile = [ "rawOptionsJson" "rawOverridesJson" ];
